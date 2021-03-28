@@ -48,3 +48,31 @@ func Register(c *gin.Context) {
 		"message": "恭喜你注册成功",
 	})
 }
+
+func Login(c *gin.Context) {
+	// 引入db
+	db := common.GetDB()
+	name, _ := c.GetPostForm("name")
+	password, _ := c.GetPostForm("password")
+	// 校验数据的安全性
+	log.Println(name, password)
+	// 查询数据库验证用户名和密码的用户
+	var user = new(model.User)
+	db.Where("name = ? and password = ?", name, password).First(user)
+	if user.ID == 0 {
+		log.Println("用户名或密码错误")
+		c.JSON(http.StatusOK, gin.H{
+			"message": "用户名或密码错误",
+		})
+		return
+	}
+	token, err := common.ReleaseToken(user)
+	if err != nil {
+		log.Println("生成token出错")
+	}
+	// 登录成功后发放token和cookie
+	c.JSON(http.StatusOK, gin.H{
+		"message": "登录成功，欢迎回来",
+		"token":   token,
+	})
+}

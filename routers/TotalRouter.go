@@ -13,6 +13,7 @@ func TotalRouter(r *gin.Engine) *gin.Engine {
 			c.String(http.StatusOK, "chenggong")
 		})
 		userGroup.POST("/register", controller.Register)
+		userGroup.POST("/login", controller.Login)
 	}
 	return r
 }
